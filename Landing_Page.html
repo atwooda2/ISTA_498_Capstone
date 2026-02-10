@@ -69,7 +69,7 @@
 </head>
 <body>
     <header>
-        <h1>🚀 Rocket League Research</h1>
+        <h1>Rocket League Research</h1>
         <p>Analyzing competitive gameplay patterns and player performance</p>
     </header>
 
@@ -83,7 +83,9 @@
     <div class="container">
         <section id="about">
             <h2>About This Project</h2>
-            <p>This research project explores competitive Rocket League gameplay, analyzing player strategies, team dynamics, and performance metrics to better understand high-level competitive play.</p>
+            <p style="text-indent: 50px;">Smurfing is a phenomenon in which highly skilled players choose to compete on newly created, low-ranked accounts. The reasoning behind this phenomenon is not clear to researchers, as there are a variety of reasons for it, some worse than others. This poses a persistent challenge in game development in aspects such as fairness and player experience in competitive online games. Traditional detection and mitigation strategies primarily rely on outcome-based signals such as win-loss patterns, rating irregularities, or long-term performance statistics. These approaches struggle during the early phase of an account’s lifetime, allowing smurf accounts to negatively impact matchmaking quality before ranking systems typically converge.</p>
+            <p style="text-indent: 50px;">“Smurfing” undermines competitive integrity of online games by creating an unfair matchup that can discourage new players and can distort the ranked progression system. This project addresses the need for a deeper, behavioral-focused understanding of “smurfing”. The findings would be able to inform future matchmaking research and allow for broader discussions about fairness and integrity in competitive digital environments. By emphasizing behavioral evidence and early-stage inference, this work contributes a transparent and extensible methodology for smurf detection that complements existing ranking systems and offers insights applicable to broader competitive gaming contexts.</p>
+            <p style="text-indent: 50px;">Replay data will be collected through ballchasing.gg API and processed to extract behavioral features across various rank tiers. Unsupervised learning techniques are first employed to construct rank-specific behavioral profiles that characterize gameplay patterns within each competitive tier. Players whose early gameplay exhibits significant deviation from these rank-specific behavioral distributions are assigned a smurf likelihood score based on behavioral abnormality. To complement this unsupervised profiling, a neural network model is trained on structured behavioral feature sequences to learn nonlinear and temporal relationships indicative of smurfing. The neural model produces an additional smurf likelihood estimate, which can be combined with the unsupervised deviation score to improve robustness and detection accuracy. </p>
         </section>
 
         <section id="research">
@@ -104,6 +106,11 @@
         <section id="contact">
             <h2>Contact</h2>
             <p>For inquiries about this research project, please reach out to the research team.</p>
+            <p style="text-indent: 20px;"> Alijah Atwood - <a href="mailto:atwooda2@arizona.edu">Atwooda2@arizona.edu</a></p>
+            <p style="text-indent: 20px;"> Randall Candaso - <a href="mailto:randallcandaso@arizona.edu">Randallcandaso@arizona.edu</a></p>
+            <p style="text-indent: 20px;"> David Garcia - <a href="mailto:davidgarcia1134@arizona.edu">Davidgarcia1134@arizona.edu</a></p>
+            <p style="text-indent: 20px;"> Sterling Godwin - <a href="mailto:sterlinggodwin@arizona.edu">Sterlinggodwin@arizona.edu</a></p>
+            
         </section>
     </div>
 
