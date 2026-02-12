@@ -1,83 +1,113 @@
+import time
 import requests
 from typing import List, Dict, Optional
 
 BASE_URL = "https://ballchasing.com/api/replays"
 
 
-def grab_replays(
+def fetch_replay_ids(
     token: str,
     playlist: str,
-    player_name: str,
-    rank: str,
-    total_needed: int = 125,
-) -> List[Dict]:
+    min_rank: str,
+    max_rank: Optional[str] = None,
+    count_needed: int = 125,
+    player_name: Optional[str] = None,
+    sort_by: str = "replay-date",
+    sort_dir: str = "desc",
+    per_page: int = 200,
+    sleep_s: float = 0.15,
+) -> List[str]:
     """
-    Fetch exactly `total_needed` replays for a specific rank.
+    Fetch replay IDs from ballchasing with pagination until count_needed is reached.
 
-    Args:
-        token: Ballchasing API token
-        playlist: ranked-duels | ranked-doubles | ranked-standard
-        player_name: Player to filter
-        rank: Exact rank slug (e.g., diamond-3)
-        total_needed: Number of replays to collect
-
-    Returns:
-        List of replay metadata dictionaries
+    - If max_rank is provided (and equal to min_rank), results are rank-isolated.
+    - Returns a list of replay UUIDs as strings.
     """
-
     headers = {"Authorization": token}
-    params = {
+
+    params: Dict[str, str | int] = {
         "playlist": playlist,
-        "player-name": player_name,
-        "min-rank": rank,
-        "max-rank": rank,  # critical for exact rank isolation
-        "count": min(total_needed, 200),
-        "sort-by": "replay-date",
-        "sort-dir": "desc",
+        "min-rank": min_rank,
+        "count": min(per_page, 200),
+        "sort-by": sort_by,
+        "sort-dir": sort_dir,
     }
+    if max_rank:
+        params["max-rank"] = max_rank
+    if player_name:
+        params["player-name"] = player_name
 
-    replays = []
-    url = BASE_URL
+    ids: List[str] = []
+    url: Optional[str] = BASE_URL
+    first_request = True
 
-    try:
-        while url and len(replays) < total_needed:
-            response = requests.get(url, headers=headers, params=params if url == BASE_URL else None)
-            response.raise_for_status()
-            data = response.json()
+    while url and len(ids) < count_needed:
+        # For the first request, use params. For subsequent pages, use the full "next" URL.
+        if first_request:
+            resp = requests.get(url, headers=headers, params=params, timeout=30)
+            first_request = False
+        else:
+            resp = requests.get(url, headers=headers, timeout=30)
 
-            replays.extend(data.get("list", []))
+        # Helpful error detail if something goes wrong
+        try:
+            resp.raise_for_status()
+        except requests.HTTPError:
+            raise RuntimeError(f"HTTP {resp.status_code}: {resp.text}") from None
 
-            # pagination
-            url = data.get("next")
+        data = resp.json()
 
-            # after first request, params must not be re-sent if using full "next" URL
-            params = None
+        for item in data.get("list", []):
+            rid = item.get("id")
+            if rid:
+                ids.append(rid)
+            if len(ids) >= count_needed:
+                break
 
-        return replays[:total_needed]
+        url = data.get("next")
 
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching replays: {e}")
-        return []
+        # small delay to be nice to the API / avoid spikes
+        if url and sleep_s:
+            time.sleep(sleep_s)
+
+    return ids[:count_needed]
+
+
+def main():
+    TOKEN = "7IDKb2v3rWgFyn4bmd2KAmPzoj4nSapzdx5qeUTc"
+
+    playlist = "ranked-doubles"
+
+    # If you want the Firstkiller filter like your example, set this:
+    player_name = None  # e.g., "Firstkiller"
+
+    ranks = [
+        "bronze-1", "bronze-2", "bronze-3",
+        "silver-1", "silver-2", "silver-3",
+        "gold-1", "gold-2", "gold-3",
+        "platinum-1", "platinum-2", "platinum-3",
+        "diamond-1", "diamond-2", "diamond-3",
+        "champion-1", "champion-2", "champion-3",
+        "grand-champion",
+        "supersonic-legend",
+    ]
+
+    for rank in ranks:
+        # Rank-isolated: min = max
+        replay_ids = fetch_replay_ids(
+            token=TOKEN,
+            playlist=playlist,
+            min_rank=rank,
+            max_rank=rank,
+            count_needed=125,
+            player_name=player_name,
+        )
+
+        print(f"\n{playlist} | {rank} | {len(replay_ids)} IDs")
+        # PowerShell-style output: just print the IDs
+        for rid in replay_ids:
+            print(rid)
 
 
 if __name__ == "__main__":
-    TOKEN = "PASTE_YOUR_API_TOKEN"
-
-    playlists = ["ranked-duels", "ranked-doubles", "ranked-standard"]
-
-    ranks = [
-        "bronze",
-        "silver",
-        "gold",
-        "platinum",
-        "diamond",
-        "champion",
-        "grand-champion",
-        "supersonic-legend"
-    ]
-
-    for playlist in playlists:
-        for rank in ranks:
-            print(f"\nFetching {playlist} - {rank}")
-            results = grab_replays(TOKEN, playlist, "Firstkiller", rank)
-            print(f"Collected {len(results)} replays")
+    main()
