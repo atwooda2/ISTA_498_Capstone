@@ -78,8 +78,7 @@ def main():
 
     playlist = "ranked-doubles"
 
-    # If you want the Firstkiller filter like your example, set this:
-    player_name = None  # e.g., "Firstkiller"
+    player_name = None
 
     ranks = [
         "bronze-1", "bronze-2", "bronze-3",
