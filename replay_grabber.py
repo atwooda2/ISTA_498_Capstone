@@ -4,6 +4,8 @@ import os
 import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from dotenv import load_dotenv
+load_dotenv()
 
 import requests
 
@@ -205,7 +207,9 @@ def rebuild_master_csv(replay_root: Path, master_csv_path: Path, playlist: str) 
 
     return combined_header
 def main():
-    token = os.environ.get("BALLCHASING_TOKEN", "YOUR_API_KEY_HERE")
+    token = os.environ.get("BALLCHASING_TOKEN")
+    if not token:
+        raise RuntimeError("BALLCHASING_TOKEN is not set in the environment variables.")
     playlist = "ranked-doubles"
     player_name = None
     count_per_rank = 12
