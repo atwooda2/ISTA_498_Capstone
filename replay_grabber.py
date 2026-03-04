@@ -1,10 +1,10 @@
 import csv
 import io
-import os
 import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from dotenv import load_dotenv
+import os
 load_dotenv()
 
 import requests
@@ -92,19 +92,36 @@ def download_replay_csv(
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     url = f"https://ballchasing.com/dl/stats/players/{replay_id}/{replay_id}-players.csv"
-    resp = session.get(url, headers={"Authorization": token}, timeout=60)
+
+    # Retry up to 3 times on rate limiting (429)
+    for attempt in range(3):
+        resp = session.get(url, headers={"Authorization": token}, timeout=60)
+        if resp.status_code == 429:
+            wait = 5 * (attempt + 1)
+            print(f"    Rate limited — retrying in {wait}s (attempt {attempt + 1}/3)...")
+            time.sleep(wait)
+            continue
+        break
+    else:
+        raise RuntimeError(f"Replay {replay_id} failed after 3 retries due to rate limiting.")
 
     try:
         resp.raise_for_status()
     except requests.HTTPError:
-        raise RuntimeError(f"Replay {replay_id} download failed: HTTP {resp.status_code}: {resp.text}") from None
+        raise RuntimeError(f"Replay {replay_id} download failed: HTTP {resp.status_code}") from None
 
-    content_type = resp.headers.get("Content-Type", "").lower()
     csv_text = resp.text
-    if "csv" not in content_type and "," not in csv_text:
+
+    # Detect HTML error pages (Cloudflare walls, 403 pages, etc.)
+    stripped = csv_text.lstrip()
+    if stripped.startswith("<!") or stripped.lower().startswith("<html"):
         raise RuntimeError(
-            f"Replay {replay_id} did not look like CSV content. Content-Type was '{content_type or 'unknown'}'."
+            f"Replay {replay_id} returned an HTML page instead of CSV "
+            f"(HTTP {resp.status_code}). It may be private, deleted, or rate limited."
         )
+
+    if not csv_text.strip():
+        raise RuntimeError(f"Replay {replay_id} returned empty content.")
 
     output_path.write_text(csv_text, encoding="utf-8", newline="")
     return csv_text
@@ -207,9 +224,9 @@ def rebuild_master_csv(replay_root: Path, master_csv_path: Path, playlist: str) 
 
     return combined_header
 def main():
-    token = os.environ.get("BALLCHASING_TOKEN")
+    token = os.getenv("BALLCHASING_TOKEN")
     if not token:
-        raise RuntimeError("BALLCHASING_TOKEN is not set in the environment variables.")
+        raise RuntimeError("Please set the BALLCHASING_TOKEN environment variable with your API token.")
     playlist = "ranked-doubles"
     player_name = None
     count_per_rank = 12
