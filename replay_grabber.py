@@ -239,7 +239,7 @@ def main():
         "platinum-1", "platinum-2", "platinum-3",
         "diamond-1", "diamond-2", "diamond-3",
         "champion-1", "champion-2", "champion-3",
-        "grand-champion",
+        "grand-champion-1", "grand-champion-2", "grand-champion-3",
         "supersonic-legend",
     ]
 
