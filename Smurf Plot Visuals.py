@@ -25,7 +25,7 @@ for col in stat_cols:
 
 # ── Shared config ─────────────────────────────────────────────────────────────
 NORMAL_COLOR = "#378ADD"
-SMURF_COLOR  = "#E24B4A"
+SMURF_COLOR  = "#dfa53b"
 
 norm  = df[df["smurf"] == 0]
 smurf = df[df["smurf"] == 1]
@@ -131,7 +131,7 @@ tier_styles = {
     "Beginner":     {"color": "#4CAF50",   "alpha": 0.35, "s": 10},
     "Intermediate": {"color": "#FF9800",   "alpha": 0.35, "s": 10},
     "Advanced":     {"color": "#3F51B5",   "alpha": 0.35, "s": 10},
-    "Smurf":        {"color": SMURF_COLOR, "alpha": 0.95, "s": 30},
+    "Smurf":        {"color": "#E24B4A", "alpha": 0.95, "s": 30},
 }
 
 fig, ax = plt.subplots(figsize=(10, 6))
