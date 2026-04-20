@@ -1,5 +1,5 @@
 # ISTA_498_Capstone
-Replay data will be collected through ballchasing.gg API and processed to extract behavioral features across various rank tiers. 
+Replay data will be collected through ballchasing.com API and processed to extract behavioral features across various rank tiers. 
 Unsupervised learning techniques are first employed to construct rank-specific behavioral profiles that characterize gameplay patterns 
 within each competitive tier. Players whose early gameplay exhibits significant deviation from these rank-specific behavioral 
 distributions are assigned a smurf likelihood score based on behavioral abnormality. To complement this unsupervised profiling, a neural 
