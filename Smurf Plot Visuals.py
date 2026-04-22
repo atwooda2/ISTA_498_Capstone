@@ -1,16 +1,19 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+import matplotlib.patches as mpatches
 import seaborn as sns
 import numpy as np
 
-df = pd.read_csv("/Users/sw33t0404/Desktop/ISTA 498/ISTA_498_Capstone/replay_csvs/master_replays.csv", low_memory=False)
+df = pd.read_csv(
+    "/Users/sw33t0404/Desktop/ISTA 498/ISTA_498_Capstone/replay_csvs/master_replays.csv",
+    low_memory=False,
+)
 
-# ── Cleaning — run once, applies to every plot ────────────────────────────────
+# ── Cleaning ──────────────────────────────────────────────────────────────────
 df = df[df["rank"] != ".ipynb_checkpoints"].reset_index(drop=True)
 df["smurf"] = df["smurf"].fillna(0).astype(int)
 
-# Force numeric on stat columns that may have been read as strings
 stat_cols = [
     "score", "goals", "assists", "saves", "shots", "avg speed",
     "shooting percentage", "avg boost amount", "amount collected",
@@ -26,6 +29,8 @@ for col in stat_cols:
 # ── Shared config ─────────────────────────────────────────────────────────────
 NORMAL_COLOR = "#378ADD"
 SMURF_COLOR  = "#dfa53b"
+BAR_WIDTH    = 0.35
+PALETTE      = [NORMAL_COLOR, SMURF_COLOR]
 
 norm  = df[df["smurf"] == 0]
 smurf = df[df["smurf"] == 1]
@@ -60,9 +65,34 @@ df["tier"] = df["rank"].map(tier_map)
 df.loc[df["smurf"] == 1, "tier"] = "Smurf"
 
 
+# ── Helpers ───────────────────────────────────────────────────────────────────
+def _grouped_bar(cats, norm_vals, smurf_vals, ylabel, title, pct=False, figsize=(8, 5)):
+    x = np.arange(len(cats))
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.bar(x - BAR_WIDTH / 2, norm_vals,  BAR_WIDTH, label="Normal", color=NORMAL_COLOR)
+    ax.bar(x + BAR_WIDTH / 2, smurf_vals, BAR_WIDTH, label="Smurf",  color=SMURF_COLOR)
+    ax.set_xticks(x)
+    ax.set_xticklabels(cats)
+    ax.set_ylabel(ylabel)
+    if pct:
+        ax.yaxis.set_major_formatter(mticker.PercentFormatter())
+    ax.set_title(title)
+    ax.legend()
+    plt.tight_layout()
+    plt.show()
+
+
+def _label_bars(ax, bars, color):
+    for bar in bars:
+        ax.text(
+            bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
+            f"{bar.get_height():g}", ha="center", va="bottom", fontsize=8, color=color,
+        )
+
+
 # ── Plot 1: Rank distribution ─────────────────────────────────────────────────
 plt.figure(figsize=(10, 5))
-sns.countplot(data=df, x="rank", hue="smurf", palette="coolwarm", order=rank_order)
+sns.countplot(data=df, x="rank", hue="smurf", palette=PALETTE, order=rank_order, hue_order=[0, 1])
 plt.xticks(ticks=range(len(rank_labels)), labels=rank_labels, rotation=45)
 plt.title("Rank Distribution: Smurfs vs Normal Players")
 plt.tight_layout()
@@ -70,9 +100,11 @@ plt.show()
 
 # ── Plot 2: Avg score comparison ──────────────────────────────────────────────
 score_comp = df.groupby("smurf")["score"].mean()
-plt.bar(["Normal", "Smurf"], score_comp, color=[NORMAL_COLOR, SMURF_COLOR])
-plt.ylabel("Average Score")
-plt.title("Average Score: Normal vs Smurfs")
+fig, ax = plt.subplots(figsize=(6, 5))
+ax.bar(["Normal", "Smurf"], score_comp, color=[NORMAL_COLOR, SMURF_COLOR])
+ax.set_ylabel("Average Score")
+ax.set_title("Average Score: Normal vs Smurfs")
+plt.tight_layout()
 plt.show()
 
 # ── Plot 3: Radar chart ───────────────────────────────────────────────────────
@@ -85,16 +117,16 @@ vals_norm  = np.concatenate((vals_norm,  [vals_norm[0]]))
 vals_smurf = np.concatenate((vals_smurf, [vals_smurf[0]]))
 angles     = np.concatenate((angles,     [angles[0]]))
 
-fig = plt.figure(figsize=(6, 6))
-ax  = plt.subplot(111, polar=True)
+fig, ax = plt.subplots(figsize=(6, 6), subplot_kw={"polar": True})
 ax.plot(angles, vals_norm,  label="Normal", linewidth=2, color=NORMAL_COLOR)
 ax.plot(angles, vals_smurf, label="Smurf",  linewidth=2, color=SMURF_COLOR)
 ax.fill(angles, vals_norm,  alpha=0.2, color=NORMAL_COLOR)
 ax.fill(angles, vals_smurf, alpha=0.2, color=SMURF_COLOR)
 ax.set_xticks(angles[:-1])
 ax.set_xticklabels(stats)
-plt.title("Radar Chart: Gameplay Stats Comparison")
-plt.legend()
+ax.set_title("Radar Chart: Gameplay Stats Comparison")
+ax.legend()
+plt.tight_layout()
 plt.show()
 
 # ── Plot 4 & 5: Correlation heatmaps ─────────────────────────────────────────
@@ -103,11 +135,13 @@ heatmap_cols = ["score", "goals", "assists", "saves", "shots", "avg speed"]
 plt.figure(figsize=(10, 6))
 sns.heatmap(smurf[heatmap_cols].corr(), annot=True, cmap="Reds")
 plt.title("Smurf Correlation Heatmap")
+plt.tight_layout()
 plt.show()
 
 plt.figure(figsize=(10, 6))
 sns.heatmap(norm[heatmap_cols].corr(), annot=True, cmap="Blues")
 plt.title("Normal Player Correlation Heatmap")
+plt.tight_layout()
 plt.show()
 
 # ── Plot 6: Speed KDE ─────────────────────────────────────────────────────────
@@ -117,20 +151,22 @@ sns.kdeplot(smurf["avg speed"].dropna(), fill=True, label="Smurf",  color=SMURF_
 plt.title("Speed Distribution: Normal vs Smurf")
 plt.xlabel("Average Speed")
 plt.legend()
+plt.tight_layout()
 plt.show()
 
 # ── Plot 7: Boost boxplot ─────────────────────────────────────────────────────
 plt.figure(figsize=(10, 5))
-sns.boxplot(data=df, x="smurf", y="avg boost amount", palette="coolwarm")
+sns.boxplot(data=df, x="smurf", y="avg boost amount", palette=PALETTE, order=[0, 1])
 plt.xticks([0, 1], ["Normal", "Smurf"])
 plt.title("Boost Usage Comparison")
+plt.tight_layout()
 plt.show()
 
 # ── Plot 8: Scatter — field positioning by tier ───────────────────────────────
 tier_styles = {
-    "Beginner":     {"color": "#4CAF50",   "alpha": 0.35, "s": 10},
-    "Intermediate": {"color": "#FF9800",   "alpha": 0.35, "s": 10},
-    "Advanced":     {"color": "#3F51B5",   "alpha": 0.35, "s": 10},
+    "Beginner":     {"color": "#4CAF50", "alpha": 0.35, "s": 10},
+    "Intermediate": {"color": "#FF9800", "alpha": 0.35, "s": 10},
+    "Advanced":     {"color": "#3F51B5", "alpha": 0.35, "s": 10},
     "Smurf":        {"color": "#E24B4A", "alpha": 0.95, "s": 30},
 }
 
@@ -140,9 +176,7 @@ for tier, style in tier_styles.items():
     ax.scatter(
         subset["time behind ball"],
         subset["time in front of ball"],
-        c=style["color"],
-        alpha=style["alpha"],
-        s=style["s"],
+        c=style["color"], alpha=style["alpha"], s=style["s"],
         label=f"{tier} (n={len(subset)})",
     )
 ax.set_xlabel("Time Behind Ball")
@@ -183,41 +217,20 @@ plt.tight_layout()
 plt.show()
 
 # ── Plot 11: Speed profile grouped bar ───────────────────────────────────────
-speed_cats  = ["Slow speed", "Boost speed", "Supersonic"]
-speed_cols  = ["percentage slow speed", "percentage boost speed", "percentage supersonic speed"]
-norm_means  = [norm[c].mean()  for c in speed_cols]
-smurf_means = [smurf[c].mean() for c in speed_cols]
-
-x, w = np.arange(len(speed_cats)), 0.35
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.bar(x - w/2, norm_means,  w, label="Normal", color=NORMAL_COLOR)
-ax.bar(x + w/2, smurf_means, w, label="Smurf",  color=SMURF_COLOR)
-ax.set_xticks(x)
-ax.set_xticklabels(speed_cats)
-ax.set_ylabel("% of game time")
-ax.yaxis.set_major_formatter(mticker.PercentFormatter())
-ax.set_title("Speed Profile: Normal vs Smurf")
-ax.legend()
-plt.tight_layout()
-plt.show()
+_grouped_bar(
+    ["Slow speed", "Boost speed", "Supersonic"],
+    [norm[c].mean()  for c in ["percentage slow speed", "percentage boost speed", "percentage supersonic speed"]],
+    [smurf[c].mean() for c in ["percentage slow speed", "percentage boost speed", "percentage supersonic speed"]],
+    "% of game time", "Speed Profile: Normal vs Smurf", pct=True,
+)
 
 # ── Plot 12: Air vs ground grouped bar ───────────────────────────────────────
-air_cats  = ["On ground", "Low air", "High air"]
-air_cols  = ["percentage on ground", "percentage low in air", "percentage high in air"]
-norm_air  = [norm[c].mean()  for c in air_cols]
-smurf_air = [smurf[c].mean() for c in air_cols]
-
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.bar(x - w/2, norm_air,  w, label="Normal", color=NORMAL_COLOR)
-ax.bar(x + w/2, smurf_air, w, label="Smurf",  color=SMURF_COLOR)
-ax.set_xticks(x)
-ax.set_xticklabels(air_cats)
-ax.set_ylabel("% of game time")
-ax.yaxis.set_major_formatter(mticker.PercentFormatter())
-ax.set_title("Air vs Ground: Normal vs Smurf")
-ax.legend()
-plt.tight_layout()
-plt.show()
+_grouped_bar(
+    ["On ground", "Low air", "High air"],
+    [norm[c].mean()  for c in ["percentage on ground", "percentage low in air", "percentage high in air"]],
+    [smurf[c].mean() for c in ["percentage on ground", "percentage low in air", "percentage high in air"]],
+    "% of game time", "Air vs Ground: Normal vs Smurf", pct=True,
+)
 
 # ── Plot 13: Avg speed by rank — line with smurf reference ───────────────────
 rank_speed      = df[df["rank"].isin(rank_order)].groupby("rank")["avg speed"].mean().reindex(rank_order)
@@ -251,85 +264,71 @@ plt.tight_layout()
 plt.show()
 
 # ── Plot 15: Boost management grouped bar ─────────────────────────────────────
-boost_cats  = ["Boost collected", "Boost stolen", "Avg boost amount"]
-boost_cols  = ["amount collected", "amount stolen", "avg boost amount"]
-norm_boost  = [norm[c].mean()  for c in boost_cols]
-smurf_boost = [smurf[c].mean() for c in boost_cols]
-
-x3 = np.arange(len(boost_cats))
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.bar(x3 - w/2, norm_boost,  w, label="Normal", color=NORMAL_COLOR)
-ax.bar(x3 + w/2, smurf_boost, w, label="Smurf",  color=SMURF_COLOR)
-ax.set_xticks(x3)
-ax.set_xticklabels(boost_cats)
-ax.set_ylabel("Boost units / amount")
-ax.set_title("Boost Management: Normal vs Smurf")
-ax.legend()
-plt.tight_layout()
-plt.show()
+_grouped_bar(
+    ["Boost collected", "Boost stolen", "Avg boost amount"],
+    [norm[c].mean()  for c in ["amount collected", "amount stolen", "avg boost amount"]],
+    [smurf[c].mean() for c in ["amount collected", "amount stolen", "avg boost amount"]],
+    "Boost units / amount", "Boost Management: Normal vs Smurf",
+)
 
 # ── Plot 16: Pitch thirds grouped bar ─────────────────────────────────────────
-third_cats   = ["Defensive third", "Neutral third", "Offensive third"]
-third_cols   = ["percentage defensive third", "percentage neutral third", "percentage offensive third"]
-norm_thirds  = [norm[c].mean()  for c in third_cols]
-smurf_thirds = [smurf[c].mean() for c in third_cols]
+_grouped_bar(
+    ["Defensive third", "Neutral third", "Offensive third"],
+    [norm[c].mean()  for c in ["percentage defensive third", "percentage neutral third", "percentage offensive third"]],
+    [smurf[c].mean() for c in ["percentage defensive third", "percentage neutral third", "percentage offensive third"]],
+    "% of game time", "Pitch Third Positioning: Normal vs Smurf", pct=True,
+)
 
-x4 = np.arange(len(third_cats))
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.bar(x4 - w/2, norm_thirds,  w, label="Normal", color=NORMAL_COLOR)
-ax.bar(x4 + w/2, smurf_thirds, w, label="Smurf",  color=SMURF_COLOR)
-ax.set_xticks(x4)
-ax.set_xticklabels(third_cats)
-ax.set_ylabel("% of game time")
-ax.yaxis.set_major_formatter(mticker.PercentFormatter())
-ax.set_title("Pitch Third Positioning: Normal vs Smurf")
-ax.legend()
+# ── Plot 17: Top 5 smurf detection thresholds (one panel per stat) ───────────
+threshold_info = [
+    ("Score",                  "score",                     "90.3% of smurfs above norm p90"),
+    ("Goals",                  "goals",                     "90.3% of smurfs above norm p90"),
+    ("Shots",                  "shots",                     "80.6% of smurfs above norm p90"),
+    ("Big Pad Collected",      "amount collected big pads", "58.1% above norm p90"),
+    ("Time in Offensive Half", "time offensive half",       "58.1% above norm p90"),
+]
+
+bar_x      = [0, 1, 2]
+bar_labels = ["Normal\nMedian", "Normal\n90th pct", "Smurf\nMedian"]
+bar_colors = [NORMAL_COLOR, NORMAL_COLOR, SMURF_COLOR]
+bar_alphas = [0.55, 1.0, 1.0]
+
+fig, axes = plt.subplots(2, 3, figsize=(14, 8))
+fig.suptitle(
+    "Top 5 Smurf Detection Thresholds\n(ranked by % of smurfs exceeding normal 90th percentile)",
+    fontsize=13, fontweight="bold",
+)
+
+for i, (name, col, pct_label) in enumerate(threshold_info):
+    ax = axes[i // 3, i % 3]
+    n_med = round(norm[col].median(),      1)
+    n_p90 = round(norm[col].quantile(0.9), 1)
+    s_med = round(smurf[col].median(),     1)
+    vals  = [n_med, n_p90, s_med]
+
+    for j, (v, c, a) in enumerate(zip(vals, bar_colors, bar_alphas)):
+        ax.bar(j, v, width=0.6, color=c, alpha=a)
+        ax.text(j, v + max(vals) * 0.03, f"{v:g}",
+                ha="center", va="bottom", fontsize=9, fontweight="bold")
+
+    ax.set_xticks(bar_x)
+    ax.set_xticklabels(bar_labels, fontsize=8)
+    ax.set_title(f"{name}\n{pct_label}", fontsize=9, fontweight="bold")
+    ax.set_ylabel("Stat value", fontsize=8)
+    ax.tick_params(axis="y", labelsize=8)
+    ax.spines[["top", "right"]].set_visible(False)
+
+# Use the 6th cell as a legend panel
+ax_leg = axes[1, 2]
+ax_leg.axis("off")
+ax_leg.legend(
+    handles=[
+        mpatches.Patch(facecolor=NORMAL_COLOR, alpha=0.55, label="Normal Median"),
+        mpatches.Patch(facecolor=NORMAL_COLOR,              label="Normal 90th pct"),
+        mpatches.Patch(facecolor=SMURF_COLOR,               label="Smurf Median"),
+    ],
+    loc="center", fontsize=11, title="Legend", title_fontsize=12,
+)
+
 plt.tight_layout()
 plt.show()
-
-# ── Plot 17: Top 5 smurf detection thresholds ────────────────────────────────
-# Ranked by % of smurfs that exceed the normal player 90th percentile
-threshold_stats = [
-    "Score\n(90.3% of smurfs\nabove norm p90)",
-    "Goals\n(90.3% of smurfs\nabove norm p90)",
-    "Shots\n(80.6% of smurfs\nabove norm p90)",
-    "Big pad\ncollected\n(58.1% above)",
-    "Time in\noffensive half\n(58.1% above)",
-]
-thresh_cols = [
-    "score",
-    "goals",
-    "shots",
-    "amount collected big pads",
-    "time offensive half",
-]
- 
-normal_medians = [round(norm[c].median(), 1) for c in thresh_cols]
-normal_p90     = [round(norm[c].quantile(0.9), 1) for c in thresh_cols]
-smurf_medians  = [round(smurf[c].median(), 1) for c in thresh_cols]
- 
-x5 = np.arange(len(threshold_stats))
-fig, ax = plt.subplots(figsize=(13, 7))
-bars_n  = ax.bar(x5 - w, normal_medians, w, label="Normal median",   color=NORMAL_COLOR, alpha=0.6)
-bars_p  = ax.bar(x5,     normal_p90,     w, label="Normal 90th pct", color=NORMAL_COLOR)
-bars_s  = ax.bar(x5 + w, smurf_medians,  w, label="Smurf median",    color=SMURF_COLOR)
- 
-# Value labels on top of each bar
-for bar in bars_n:
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
-            f"{bar.get_height():g}", ha="center", va="bottom", fontsize=8, color=NORMAL_COLOR)
-for bar in bars_p:
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
-            f"{bar.get_height():g}", ha="center", va="bottom", fontsize=8, color=NORMAL_COLOR)
-for bar in bars_s:
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
-            f"{bar.get_height():g}", ha="center", va="bottom", fontsize=8, color=SMURF_COLOR)
- 
-ax.set_xticks(x5)
-ax.set_xticklabels(threshold_stats, ha="center", fontsize=9)
-ax.set_ylabel("Stat value")
-ax.set_title("Top 5 Smurf Detection Thresholds\n(ranked by % of smurfs exceeding normal 90th percentile)")
-ax.legend()
-plt.tight_layout()
-plt.show()
- 
