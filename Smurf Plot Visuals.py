@@ -52,9 +52,9 @@ tier_map = {
     "gold-1": "Intermediate",      "gold-2": "Intermediate",      "gold-3": "Intermediate",
     "platinum-1": "Intermediate",  "platinum-2": "Intermediate",  "platinum-3": "Intermediate",
     "diamond-1": "Intermediate",   "diamond-2": "Intermediate",   "diamond-3": "Intermediate",
-    "champion-1": "Advanced",      "champion-2": "Advanced",      "champion-3": "Advanced",
-    "grand-champion-1": "Advanced","grand-champion-2": "Advanced","grand-champion-3": "Advanced",
-    "supersonic-legend": "Advanced",
+    "champion-1": "Expert",      "champion-2": "Expert",      "champion-3": "Expert",
+    "grand-champion-1": "Expert","grand-champion-2": "Expert","grand-champion-3": "Expert",
+    "supersonic-legend": "Expert",
 }
 df["tier"] = df["rank"].map(tier_map)
 df.loc[df["smurf"] == 1, "tier"] = "Smurf"
@@ -130,7 +130,7 @@ plt.show()
 tier_styles = {
     "Beginner":     {"color": "#4CAF50",   "alpha": 0.35, "s": 10},
     "Intermediate": {"color": "#FF9800",   "alpha": 0.35, "s": 10},
-    "Advanced":     {"color": "#3F51B5",   "alpha": 0.35, "s": 10},
+    "Expert":       {"color": "#9C27B0",   "alpha": 0.35, "s": 10},
     "Smurf":        {"color": SMURF_COLOR, "alpha": 0.95, "s": 30},
 }
 
@@ -275,7 +275,7 @@ norm_thirds  = [norm[c].mean()  for c in third_cols]
 smurf_thirds = [smurf[c].mean() for c in third_cols]
 
 x4 = np.arange(len(third_cats))
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plt.subplots(figsize=(5, 7))
 ax.bar(x4 - w/2, norm_thirds,  w, label="Normal", color=NORMAL_COLOR)
 ax.bar(x4 + w/2, smurf_thirds, w, label="Smurf",  color=SMURF_COLOR)
 ax.set_xticks(x4)
@@ -489,3 +489,63 @@ ax.set_title("Big Pad Stealing Distribution: Normal vs Smurf\n(smurfs deny boost
 ax.legend()
 plt.tight_layout()
 plt.show()
+
+# ── Plots 23–30: one plot per stat across Beginner / Intermediate / Expert / Smurf ──
+smurf_stat_cols = [
+    "avg speed",
+    "amount used while supersonic",
+    "time high in air",
+    "percentage on ground",
+    "percentage offensive third",
+    "time supersonic speed",
+    "avg powerslide time",
+    "percentage behind ball",
+]
+smurf_stat_labels = [
+    "Average Speed",
+    "Boost Used While Supersonic",
+    "Time High in Air",
+    "Percentage on Ground",
+    "Percentage Offensive Third",
+    "Time Supersonic Speed",
+    "Avg Powerslide Time",
+    "Percentage Behind Ball",
+]
+
+for col in smurf_stat_cols:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
+
+tier_order  = ["Beginner", "Intermediate", "Expert", "Smurf"]
+tier_colors = {
+    "Beginner":     "#4CAF50",
+    "Intermediate": "#FF9800",
+    "Expert":       "#9C27B0",
+    "Smurf":        SMURF_COLOR,
+}
+
+x     = np.arange(len(tier_order))
+bar_w = 0.5
+
+for col, label in zip(smurf_stat_cols, smurf_stat_labels):
+    values = [df[df["tier"] == t][col].mean() for t in tier_order]
+
+    fig, ax = plt.subplots(figsize=(7, 5))
+    bars = ax.bar(x, values, width=bar_w,
+                  color=[tier_colors[t] for t in tier_order],
+                  edgecolor="white", linewidth=0.7)
+    for bar, val in zip(bars, values):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() * 1.02,
+            f"{val:.1f}",
+            ha="center", va="bottom", fontsize=10,
+        )
+    ax.set_xticks(x)
+    ax.set_xticklabels(tier_order, fontsize=11)
+    ax.set_ylabel(label, fontsize=10)
+    ax.set_title(f"{label}: Beginner / Intermediate / Expert / Smurf", fontsize=11)
+    ax.set_ylim(0, max(values) * 1.2)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    plt.tight_layout()
+    plt.show()
