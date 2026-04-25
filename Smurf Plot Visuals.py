@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import seaborn as sns
 import numpy as np
+from pathlib import Path
 
-df = pd.read_csv("/Users/sw33t0404/Desktop/ISTA 498/ISTA_498_Capstone/replay_csvs/master_replays.csv", low_memory=False)
+DATA_PATH = Path(__file__).parent / "replay_csvs" / "master_replays.csv"
+df = pd.read_csv(DATA_PATH, low_memory=False)
 
 # ── Cleaning — run once, applies to every plot ────────────────────────────────
 df = df[df["rank"] != ".ipynb_checkpoints"].reset_index(drop=True)
@@ -60,19 +62,25 @@ df["tier"] = df["rank"].map(tier_map)
 df.loc[df["smurf"] == 1, "tier"] = "Smurf"
 
 
-# ── Plot 1: Rank distribution ─────────────────────────────────────────────────
-plt.figure(figsize=(10, 5))
-sns.countplot(data=df, x="rank", hue="smurf", palette="coolwarm", order=rank_order)
-plt.xticks(ticks=range(len(rank_labels)), labels=rank_labels, rotation=45)
-plt.title("Rank Distribution: Smurfs vs Normal Players")
-plt.tight_layout()
-plt.show()
+# ── Plot 1+2 Combined: Avg score by rank, smurf bar shown where smurfs exist ──
+norm_score_by_rank  = [norm[norm["rank"] == r]["score"].mean() for r in rank_order]
+smurf_score_by_rank = [
+    smurf[smurf["rank"] == r]["score"].mean() if len(smurf[smurf["rank"] == r]) > 0 else np.nan
+    for r in rank_order
+]
 
-# ── Plot 2: Avg score comparison ──────────────────────────────────────────────
-score_comp = df.groupby("smurf")["score"].mean()
-plt.bar(["Normal", "Smurf"], score_comp, color=[NORMAL_COLOR, SMURF_COLOR])
-plt.ylabel("Average Score")
-plt.title("Average Score: Normal vs Smurfs")
+x = np.arange(len(rank_order))
+w = 0.4
+
+fig, ax = plt.subplots(figsize=(14, 6))
+ax.bar(x - w/2, norm_score_by_rank,  w, label="Normal", color=NORMAL_COLOR, alpha=0.85, edgecolor="white")
+ax.bar(x + w/2, smurf_score_by_rank, w, label="Smurf",  color=SMURF_COLOR,  alpha=0.85, edgecolor="white")
+ax.set_xticks(x)
+ax.set_xticklabels(rank_labels, rotation=45, ha="right")
+ax.set_ylabel("Average Score")
+ax.set_title("Average Score by Rank: Normal Players vs Smurfs\n(smurf bar only shown where smurfs were detected in that rank)")
+ax.legend()
+plt.tight_layout()
 plt.show()
 
 # ── Plot 3: Radar chart ───────────────────────────────────────────────────────
