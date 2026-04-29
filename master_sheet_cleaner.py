@@ -78,8 +78,10 @@ def fix_master_csv(input_path: Path, output_path: Path) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description="Fix mixed-delimiter master_replays.csv")
-    parser.add_argument("--input",  default="/Users/sw33t0404/Desktop/ISTA 498/ISTA_498_Capstone/replay_csvs/master_replays.csv",       help="Input CSV path")
-    parser.add_argument("--output", default="/Users/sw33t0404/Desktop/ISTA 498/ISTA_498_Capstone/replay_csvs/master_replays_fixed.csv", help="Output CSV path")
+    _here = Path(__file__).parent / "replay_csvs"
+    parser.add_argument("--input",  default=str(_here / "master_replays.csv"),       help="Input CSV path")
+    parser.add_argument("--output", default=str(_here / "master_replays_fixed.csv"), help="Output CSV path")
+    
     args = parser.parse_args()
 
     input_path  = Path(args.input)
