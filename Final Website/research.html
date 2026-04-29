@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Smurf Detection – Investigating Competitive Integrity Through Behavioral-based Modeling In Rocket League
+    </title>
+    <link rel="stylesheet" href="styles.css" />
+
+    <style>
+      .card p {
+        text-indent: 40px;
+        margin-bottom: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="intro">
+      <h1>
+        Detecting Smurfing:<br />Competitive Integrity Through Behavioral
+        Analytics
+      </h1>
+      <p>
+        This project explores whether in game behavioral data can identify
+        smurfing in Rocket League. By analyzing player satistics across rank
+        tiers in Rocket League, we build behavioral profiles that reveal skill
+        level regardless of account rank. Our goal is to detect experienced
+        players on new accounts before traditional ranking systems can catch up.
+      </p>
+    </section>
+
+    <nav class="nav-bar">
+      <div class="nav-links">
+        <a href="home.html">Home</a>
+        <a href="research.html">Research</a>
+        <a href="data.html">Data</a>
+        <a href="references.html">References</a>
+      </div>
+    </nav>
+
+    <div class="rows">
+      <div class="card">
+        <section id="abstract">
+          <h3>Abstract</h3>
+          <p>
+            In competitive gaming, the practice of highly skilled players
+            choosing to play on lower-ranked accounts is known as smurfing. This
+            study proposes a data-driven approach for smurf detection using a
+            combination of behavioral profiling and machine learning techniques.
+            A dataset of over 1,250 player performances from online matches was
+            analyzed to identify underlying patterns in gameplay behavior.
+            Unsupervised techniques, including t-distributed Stochastic Neighbor
+            Embedding (t-SNE) and Local Outlier Factor (LOF), were applied to
+            uncover structural separation and abnormal player behavior within
+            rank groups. Building on these insights, an XGBoost (XGBClassifier)
+            model was developed to distinguish between smurf and non-smurf
+            players using performance-based features. The modeling demonstrated
+            strong detection capability, though some smurf cases exhibited
+            behavior that was not clearly distinguishable from typical players,
+            limiting classification performance. Overall, the findings suggest
+            that behavioral features do provide meaningful support for smurf
+            detection, while also highlighting inherent limitations driven by
+            variability in player behavior.
+          </p>
+        </section>
+      </div>
+
+      <div class="card">
+        <section id="literature-review">
+          <h3>Literature Review</h3>
+          <p>
+            Rank manipulation in the form of smurfing and boosting undermines
+            competitive integrity by inserting high-skill performance into
+            low-skill matchmaking, producing one-sided games and degrading
+            player experience. Smurfing violates the fairness of what is assumed
+            to be skill-based matchmaking environment and disrupts the natural
+            power chain of rank progression or regression. Smurf detection is
+            especially challenging early in an account’s life because
+            traditional systems rely heavily on outcome-based understanding that
+            require a sufficient number of matches to stabilize identification.
+          </p>
+
+          <h2>Outcome-based Rating Systems</h2>
+          <p>
+            Modern day rating systems primarily focus on the outcomes of matches
+            or games, relative to typical performance patterns seen in different
+            rating tiers. A large issue with these traditional systems is their
+            inability to detect smurfing in the early-stages of an account.
+            Using machine learning advantages, Shimanuki and Hosobe (2024)3
+            looked to create a rating system influenced by a fluctuating rating
+            value defined as an Elo Factor, which uses features from game
+            records in order to create a predictive ranking that is then
+            compared to other players to find an expected outcome and finds
+            either enhanced or delayed rating convergence based on clear player
+            superiority.
+          </p>
+          <p>
+            Their work showcases how a much needed-enhancement of modern ranking
+            systems can be created as a solution that manages to take out the
+            aspect of smurfing that truly determines skill rather than
+            consistent rising of ranks. However, their approach primarily
+            focuses on adversarial board games and is limited in behavioral
+            statistics available to those games. While useful for the setting of
+            a board game, their research may not be as applicable to many online
+            competitive games, but does show how an updated ranking system may
+            play a factor in targeting smurfing.
+          </p>
+
+          <h2>Unsupervised Profiling and Smurf Identification</h2>
+          <p>
+            The most unethical part of smurfing is the manipulative and negative
+            effects it has on the balancing of the rank-based competitive
+            environment. Smurf players often have the performance-ability of
+            higher ranked play, but choose to abuse it in lower ranked lobbies.
+            Ding et al. (2024)5 aimed to create a modeling pipeline that
+            utilized unsupervised techniques, such as PCA and K-means
+            clustering, to identify irregular performance given the tier of a
+            rank. While their approach proved to be high performing in its
+            identified profiles, the performance was determined by a voter-based
+            system from domain experts. In addition to this, the modeling
+            techniques were limited to its unsupervised nature, which caused its
+            reliance on existing domain experts. The research in this study
+            hopes to combine unsupervised techniques with thorough, predictive
+            analysis.
+          </p>
+
+          <h2>Behavioral Pattern Mining</h2>
+          <p>
+            The game Rocket League offers a distinctive opportunity in analyzing
+            mechanical and behavioral patterns within the player population.
+            Mathonat et al. (2020)2 uses this specific data availability to be
+            able to create an interpretable model that detects user skill shot
+            ability. Using the match-replay system, external controller
+            information, and expert annotation, they were able to mine
+            descriptive behavioral patterns within sequences of player action.
+            Using these mined patterns, re-encoded sequences were created for
+            supervised skill classification. Their analytical analysis is
+            limited to the concept of identifying ability through skill shot
+            behavior, but can be used for much more applicability, such as
+            understanding smurfing behavior among different ranks.
+          </p>
+
+          <h2>Smurfing Impact on Experience</h2>
+          <p>
+            An important aspect of online competitive multiplayer games is that
+            the players engage in a consumer-product relationship. They play
+            these games and participate in their online communities, which
+            provides value to the ecosystem of a game. To gather field research
+            of the average CS:GO player, McCauley, B. (2023)8 over the span of
+            about a year from March 2020 to June 2021 would play the competitive
+            shooter CS:GO for over 1,600 hours to raise their rank to Nova 2.
+            Following this process, they conducted interviews with a total of
+            eight CS:GO players from March to June 2022, many of whom had smurf
+            accounts or were on a similar rank to them, and through those
+            interviews discussed their findings.
+          </p>
+          <p>
+            The first finding was that smurfing was embedded in the prosumer
+            experience. It tends to have an impact on players, especially those
+            in competitive fields, since they tend to unfairly cause drops in
+            rankings. The second discovery from the interviews was the complex
+            motivations of smurfs. Smurfs are not always malicious in intent and
+            sometimes associate smurfing with positive outcomes for themselves
+            by playing at lower levels for personal enjoyment due to high stress
+            of rank upkeep. Lastly, McCauley, B. (2023)8 discusses whether the
+            act of smurfing is generally seen as cheating. They concluded an
+            indirect answer to the question, basing the opinion on perspective,
+            and acknowledging that it can be seen as a lesser form of cheating
+            compared to more-excessive forms such as hacking.
+          </p>
+
+          <h2>User Perception</h2>
+          <p>
+            Smurfing is widely recognized as a persistent issue within the
+            online gaming sphere, negatively affecting player experience and
+            perceptions of fairness. Monge and Matthews (2023)1 conducted a
+            multi-study investigation at The Ohio State University examining
+            player attitudes toward smurfing, beginning with a baseline survey
+            of 328 participants recruited from gaming Subreddits and a
+            university gaming club. Their results showed that 69% of respondents
+            admitted to smurfing occasionally, albeit typically believing most
+            smurfs are more hostile than themselves, and 94% believed that
+            smurfing occurs regularly in the games they play. These findings
+            indicate broad awareness of the issue as a common occurrence in a
+            lot of online gaming spaces, and highlight the necessity of more
+            matchmaking integrity.
+          </p>
+
+          <h2>Industry Landscape</h2>
+          <p>
+            Industry stakeholders have begun addressing this need through
+            behavior-based analytics and account monitoring systems. TrustCloud
+            (2023)4 categorizes behavioral pattern analysis as a core approach
+            to countering smurf detection, by categorizing methods into
+            behavior-based indicators (e.g. rapid performance progression),
+            account-based signals, and identity verification. The report cites a
+            2022 North American machine learning experiment that reduced
+            smurfing activity by over 30% by detecting deviations from expected
+            player behavior profiles, demonstrating the commercial viability of
+            behavioral detection methods. While some industry proposals
+            emphasize stronger digital identity verification, these approaches
+            raise concerns around privacy and accessibility, leaving
+            behavior-driven detection as a scalable and widely applicable
+            solution. TrustCloud (2023)4 primarily addresses the problem at the
+            point of account creation, while this study looks to address it
+            after the account is created.
+          </p>
+
+          <h2>Economic Impact of Player Churn</h2>
+          <p>
+            In the free to play video game ecosystem, revenue is linked to
+            player retention. Research by Kang, H., Suh, C., & Kim, H. K.
+            (2024)9 into competitive game logs found that matchmaking quality is
+            a primary determinant of user churn. Their study demonstrated
+            extreme skill gaps do not just cause individual match
+            dissatisfaction, but correlate directly with a players decision to
+            stop playing a game altogether. This “churn” is a financial risk, as
+            Mulla et al. (2025)10 note, the cost of acquiring a new player via
+            marketing is significantly higher than the cost of retaining a
+            current one. By identifying smurf driven skill disparities early,
+            developers can protect the long term sustainability of the game by
+            appeasing current player satisfaction.
+          </p>
+
+          <h2>Detection Gaps</h2>
+          <p>
+            Traditional matchmaking systems, such as Elo, face limitations in
+            rating convergence speed. Shimanuki and Hosobe (2024)3 found that
+            outcomes based models that rely on just wins and losses are slow to
+            stabilize an account's true skill level, particularly in new
+            accounts. This delay in rating accuracy during the early stages of
+            an accounts lifecycle creates a window where smurf accounts can
+            disrupt dozens of matches before the matchmaking algorithm adjusts
+            to their actual skill level. As the market for anti-cheat and fair
+            play software is projected to reach $23.8 billion by 2032 (Verified
+            Market Research, 2026)11, there is growing commercial and academic
+            interest in proactive behavioral modeling. Systems that can infer
+            skill through gameplay patterns rather than just win/loss records
+            represent the next step in accelerating rating accuracy and
+            competitive integrity.
+          </p>
+
+          <h2>Community</h2>
+          <p>
+            While peer-reviewed literature establishes the theoretical framework
+            for player upset, qualitative data from community hubs like Reddit
+            provide essential insight into the current user experience of the
+            player base. These forums offer a real-time record of player
+            sentiment that formal studies often lack. For instance, recent
+            threads indicate that smurfing has transitioned from a minor
+            nuisance to a primary driver of player upset. One newer player
+            summarized their experience as "session fatigue" after encountering
+            three smurfs in a single night, they said “I have played many
+            competitive games and have not seen this consistent of smurfs
+            before... I had to get off” (Children_Of_4, 2025). All over Rocket
+            Leagues forums is the discussion of smurfing. Poster Yappaholic
+            (2024)12 says “I’m so tired of smurfs,” describing a brand-new
+            account that quickly climbed to high ranks in team play, performed
+            advanced aerial maneuvers to dominate early play start, then quit
+            early at 3:30.
+          </p>
+          <p>
+            Beyond formal studies, Lawler (2024)11, a popular Rocket League
+            content creator and YouTuber, shows that creator commentary has
+            started treating smurfing as a structural design problem in Rocket
+            League’s ranked ecosystem, rather than just the behavior of some
+            players. In his breakdown video made for the community analyzing
+            Rocket League’s official changes, Lawler frames the issue as rooted
+            in placement match design and MMR convergence speed. These systemic
+            flaws let high skill players dominate low rank lobbies before their
+            ratings are adjusted (Lawler, 2024)11. This creator-level analysis
+            complements raw player frustration and highlights the need for
+            improvement of current balancing systems.
+          </p>
+          <p>
+            By hearing community voices from both common players and
+            influencers, it illustrates that both groups are explicitly calling
+            for better smurf detection. These first-hand accounts from Reddit
+            boards to Steam retention concerns reinforce a need for early
+            behavioral profiling and modeling analysis systems.
+          </p>
+
+          <h2>Conclusion</h2>
+          <p>
+            These works suggest a realistic path toward early-stage smurf
+            identification through the use of behavioral understanding via
+            various machine-learning techniques. Previous works have shown the
+            inclusion of mathematical influence to weigh early player
+            performance, unsupervised techniques to identify irregularities
+            within specific ranks, and how to identify behavioral patterns
+            within non-outcome-based data. By combining the aspects from these
+            different approaches, this research paper aims to create an
+            early-stage system that can identify the likelihood of an account
+            exhibiting smurf-like behavior, through the use of unsupervised and
+            network-based modeling techniques.
+          </p>
+        </section>
+      </div>
+
+      <div class="card">
+        <section id="methodology">
+          <h3>2. Methodology</h3>
+          <h2>Data Collection</h2>
+          <p>
+            To build a behavioral dataset we scraped the website
+            Ballchasing.com’s replay API, a community replay repository that
+            hosts millions of parsed Rocket League replays with detailed
+            per-player statistics. Using python, a curated scraping file was
+            created that operates in two modes. The first, targets rank-isolated
+            replay pools by querying the API with min-rank and max-rank filters
+            set to the same rank tier. This ensures that every replay collected
+            reflects genuine matchmaking at that specific rank. The second mode
+            targets a curated group of suspected smurf replays by searching
+            through a specific Ballchasing-filtered URL. This search then pulls
+            all replays associated with those flagged accounts.
+          </p>
+          <p>
+            For each rank tier, across 20 different levels spanning from Bronze
+            through Supersonic Legend, the scraping file fetched a target number
+            of replay IDs. Using paginated API requests, downloaded was the
+            pre-parsed player statistics converted into a CSV, for each replay
+            group directly from Ballchasing’s stats export endpoint:
+            <br /><code
+              >https://ballchasing.com/dl/stats/players/{replayID}/{replayID}-players.csv</code
+            >
+          </p>
+          <p>
+            Each individual CSV contains one row for each player per game,
+            capturing over 70 behavioral statistics including performance data
+            such as game scores, boost management, movement calculations, field
+            positioning, and aerial ability. These files were saved directly to
+            an online repository, contained in a structured folder hierarchy
+            organized by rank tier, and simultaneously merged into a unified
+            master_repays.csv. The scraping process included retry logic for
+            rate limiting, HTML error page detection to catch failed downloads,
+            and duplicate/skipping to ensure that previously downloaded replays
+            were never re-fetched.
+          </p>
+          <p>
+            The master CSV required several cleaning processes before it could
+            be used for analysis. The primary issue was a mixed-delimiter format
+            introduced during the merge process, where the first four metadata
+            columns (replay_id, playlist, rank, color) were stored as a single
+            comma-separated string rather than individual columns. A dedicated
+            script-fixer file was written to split and reformat each replay to
+            produce a clean, fully comma-delimited file for data frame
+            conversion.
+          </p>
+          <p>
+            Smurf labeling was performed manually because of the importing of
+            replays from the specific Ballchasing group
+            “potential-smurfs-enaka01dhi”, a community-reported collection of
+            suspected smurf accounts. These replays were downloaded separately
+            and merged into the master dataset. Players from this group were
+            assigned the binary value of 1, while all rank-isolated replays
+            collected through normal matchmaking were labeled with a value of 0.
+            The final dataset contained 1,205 normal players and 51 labeled
+            smurf records across various rank tiers.
+          </p>
+        </section>
+      </div>
+
+      <div class="card">
+        <section id="visualization">
+          <h3>Dataset Visualization</h3>
+          <p>
+            With the labeled data in hand, separation metrics were calculated
+            for every available stat, including z-scores and the percentage of
+            smurf players exceeding the normal player 90th percentile, in order
+            to rank which behavioral signals most-reliably distinguish smurfs
+            from legitimate players.
+          </p>
+          <p>
+            The most direct evidence of smurfing appears in Graph 1 (Point
+            Disparity), which displays what assigned rank’s average score should
+            be. In each rank a smurf was found, the smurf averaged consistently
+            between +400 to as high as +1200 points above the expected score per
+            game value. This ties in directly with Graph 2 (AVG Score), which
+            breaks this down across each rank tier where smurfs were detected.
+            Rather than having a single aggregate comparison, the chart displays
+            the disparity in a way that make it impossible to ignore. At almost
+            every rank from Bronze through Champion, the smurf bar dwarfs the
+            normal player bar, with the most extreme case being at Platinum 3
+            where the smurfs averaged over 1,600 points against a normal average
+            just below 500. One thing to note, smurfs were concentrated in the
+            lower and middle tiers (Bronze through platinum) exactly where a
+            skilled player would do the most damage before the matchmaking
+            system catches up.
+          </p>
+          <p>
+            Scoring behavior is further broken down in Graph 3 (Top 5
+            Thresholds), which ranks the five strongest smurf detection
+            statistics (score, goals, shots, big boost pads collected, and time
+            in offensive half) by the percentage of smurfs that exceed the
+            normal player 90th percentile. Score and goals were the strongest
+            statistical signals, with over 90% of smurfs surpassing what a
+            legitimate player achieves at the top of their rank.
+          </p>
+          <p>
+            Another indicator of a smurf is their movement and mechanical skill
+            which were captured in Graph 4 (Speed Profile), which compares the
+            proportion of game-time spent at slow, boost and supersonic speed.
+            Along with that, Graph 5 (Speed Distribution) shows that the smurf
+            speed curve is shifted noticeably rightward from normal players.
+            Graph 6 (Air vs Ground) reinforces this, revealing that smurfs spend
+            significantly more time in the air – a mechanical skill that takes
+            hundreds of hours to develop and is nearly impossible to fake –
+            compared to their rank placements. Another high level skill is
+            displayed in graph 7 (Boost Management) and 8 (Boost Usage), which
+            shows that smurfs collect/steal more boost overall and also maintain
+            that boost to allow for those high-flying mechanics to take form. In
+            graph 9 (Boost stealing), it highlights that smurfs are able to deny
+            big boost pads at nearly 2.5 times the rate of normal players which
+            is a high-skill habit that beginners do not recognize.
+          </p>
+          <p>
+            Positional tendencies are covered in Graph 10 (Pitch Positioning),
+            showing that smurfs tend to spend more time in the offensive third
+            allowing them to maintain pressure and score more goals. On the
+            other hand, Graph 11 (Defensive Stats) reveals that smurfs concede
+            dramatically fewer goals, which is most likely in relation to the
+            amount of offensive pressure they produce. With over 90% of smurfs
+            holding opponents to fewer than 2 goals per game compared to only
+            25% of normal players. Finally, Graphs 12 and 13 (Heatmaps) reveal
+            the structural differences in how stats relate to each other between
+            the two groups, suggesting that smurfs operate with a fundamentally
+            different and more coordinated play style than a normal player at
+            lower ranks would have.
+          </p>
+        </section>
+      </div>
+
+      <div class="card">
+        <section id="dimensionality-reduction">
+          <h2>Dimensionality Reduction</h2>
+          <p>
+            The first step of the modeling pipeline was to give evidence of
+            behavioral distinction between not just the players within the
+            dataset, but between their respective ranks. This meant showcasing
+            any potential playstyle or philosophical differences that influenced
+            different skill groups amongst each rank. By creating distinct
+            behavioral profiles, evidence of abnormal deviation from skill
+            groups could then be calculated. Given the complexity and size of
+            the player data, unsupervised dimensionality reduction was
+            performed.
+          </p>
+          <p>
+            Opposed to other unsupervised dimensionality reduction techniques,
+            t-SNE was utilized for its non-linear component analysis that paired
+            with the complex nature of the data. The purely-numeric columns of
+            the data were standardized and fit into a t-SNE run of different
+            values of the perplexity parameter. Perplexity controls the balance
+            between local and global structure in t-SNE by determining the
+            effective number of neighbors considered when constructing the
+            embedding. After visual validation of different values, a perplexity
+            value of 20 was deemed fit for a final run of dimensionality
+            reduction. It should be noted that after thorough internal
+            discussion, it was chosen that t-SNE was to be on all players,
+            instead of running separate versions of t-SNE for each skill group.
+          </p>
+          <p>
+            In graphs 14 and 15, the newly constructed dimension space of the
+            dataset can be seen in two-dimensional and three-dimensional plots.
+            From an initial glance and the coloring of data points, there is
+            visual evidence of distinctive separation within ranks. To create
+            additional, mathematical evidence of this, the t-SNE coordinates
+            were used in two cases of interest that were added into predicting
+            smurf likelihood.
+          </p>
+          <p>
+            k-Means clustering was ran on the t-SNE coordinates, with a
+            cross-validated clustering value of 5. Graph 16 visualizes this
+            clustering behavior accordingly. These clustering assignments were
+            then added to the dataset as an additional predictor, in case of any
+            potential influence in smurf identification. The second case of
+            interest, more fit to the predictive scenario of the research, was
+            determining outliers within the dimension space. Local Outlier
+            Factoring, known as LOF, was ran to calculate density-based
+            neighboring scores of each data point. These calculations were then
+            assigned to each player to keep track of later in the pipeline. In
+            graph 15, the coloring of each data point matched their respective
+            LOF score and what can be seen are several suspicious players whose
+            color is significantly different from the majority. These players
+            likely had the most negative calculations based on the LOF scaling
+            and influenced their visual flagging. As mentioned, these LOF
+            calculations were then assigned respectively and later used in the
+            prediction of smurf likelihood.
+          </p>
+        </section>
+      </div>
+
+      <div class="card">
+        <section id="smurf-prediction">
+          <h2>Smurf Prediction</h2>
+          <p>
+            Now that there is both visual and mathematical evidence of
+            behavioral profiles within the playerbase, this unsupervised insight
+            can be used in identifying potential smurf behavior. Given the
+            dataset had manually inputted smurf labeling, a classification model
+            can be created. Given the high dimensionality and nonlinear
+            relationships present within the dataset, an XGBoost Classifier
+            model was selected due to its ability to capture these complex
+            feature interactions, handle feature scaling, and perform robustly
+            on this heavily-imbalanced classification scenario.
+          </p>
+          <p>
+            An initial run of the XGBClassifier was ran to give a first glimpse
+            of performance and a scope for optimization later. The data is split
+            into train and test splits, while default parameters are used on the
+            model. Results of this run can be seen in table 2. From the results,
+            it can be concluded that while the model can run moderately with
+            default parameterization, the goal of the research is to create high
+            performing smurf identifications. In addition to this, because of
+            the imbalanced ratio of smurfs to non-smurfs, it needs to be ensured
+            that the model can handle a much larger dataset seen in an actual
+            playerbase. Additionally, a threshold value for prediction should
+            also be optimized to ensure that it is relative to the scope of the
+            model’s understanding of the data. After testing different threshold
+            values, a predictive threshold value of 0.13 was chosen. Although
+            the threshold seems low in a general modeling ideology, since the
+            scenario requires high-performance anomaly detection, the imbalance
+            of the prediction class, and the testing of prediction
+            probabilities, this threshold was deemed acceptable relative to the
+            scenario. Threshold performance can be seen in table 3.
+          </p>
+          <p>
+            To accomplish modeling improvement, Randomized Grid Search
+            cross-validation was used on a Stratified k-Fold splitting.
+            Stratified k-Fold splits the data into data groupings that respect
+            the imbalanced distribution of the smurf class. Utilizing these
+            cultivated data splits, Randomized Grid Search then went through
+            random combinations of the model’s parameters to efficiently find an
+            optimized set of parameters that can be used in a tuned run of the
+            model. After the hyper-tuned parameters for the XGBClassifier was
+            found, a final run of prediction was ran using the newly optimized
+            model.
+          </p>
+        </section>
+      </div>
+
+      <div class="card">
+        <section id="results">
+          <h3>Results</h3>
+          <p>
+            From the unsupervised dimensionality reduction, clear patterns of
+            behavioral structure emerged within the dataset. The t-SNE
+            embeddings revealed visual separation across ranks, suggesting that
+            gameplay statistics capture meaningful differences in player
+            behavior, such as playstyle and performance tendencies. In addition
+            to these visual patterns, Local Outlier Factor (LOF) analysis
+            provided further quantitative support for these distinctions. The
+            resulting outlier calculations indicated that certain players
+            exhibited statistically atypical behavior, relative to their peers
+            within the same rank. These calculated outlier scores further
+            reinforced the presence of identifiable behavioral variation within
+            the playerbase.
+          </p>
+          <p>
+            For the smurf class, the predictive model achieved a precision of
+            0.64 and a recall of 0.70, resulting in an F1-score of 0.67. This
+            indicates that the model is able to identify the majority of smurf
+            players at a moderate-to-high performance rate. Specifically,
+            approximately 70% of smurfs are correctly identified, though about
+            36% of players flagged as smurfs are actually non-smurfs who truly
+            play at a high skill-level. These results can be found in Table 4.
+            It should also be noted that both before optimization and after
+            optimization, three true-smurfs were consistently unable to be
+            flagged by the model. Further investigation into these three cases
+            was performed, manually re-evaluating their respective game
+            performances. It was later determined that their in-game performance
+            metrics did not strongly differentiate from typical players,
+            suggesting that some smurfs may not exhibit clear behavioral
+            deviations within a single match. This is expanded on in the
+            Discussion section. Overall, the model demonstrates moderate-to-high
+            effectiveness in distinguishing smurf behavior, while also
+            highlighting inherent limitations in detecting players whose
+            performance does not strongly deviate from the norm.
+          </p>
+        </section>
+      </div>
+
+      <div class="card">
+        <section id="discussion">
+          <h2>Discussion</h2>
+          <p>
+            The analytical pipeline utilized in the study illustrated both the
+            significance of smurfing in the gaming industry and the difficulty
+            present in addressing it conclusively. The goal of smurfs is to
+            deceive existing competitive environments and hinder the skill-based
+            matchmaking that aims to balance competitive fairness. If left
+            unchecked, players who are true to their determined rankings are
+            made to play in online matches that run rampant of players
+            more-skilled than them. Justifiably, players will grow more and more
+            exhausted with this experience, eventually influencing the decline
+            of a game’s player base. While the techniques and algorithms
+            employed in this research aim to address this issue from a
+            statistical standpoint, they still remain limited in their scope of
+            a larger moral and security issue at hand.
+          </p>
+          <p>
+            When reflecting over the main question of this research, it can
+            still be concluded that the combination of both unsupervised
+            dimensionality reduction and predictive analysis are effective in
+            identifying smurf-behaving players. t-SNE component reduction
+            allowed for the data to be transformed into a component space that
+            visualized behavioral separation. This allowed for the calculation
+            of clustering groups and outlier scores that further influenced
+            smurf likelihood. By optimizing a highly-complex classifier model,
+            that took into account the in-game performance of players along with
+            the insights of the unsupervised techniques, a smurf detection
+            system was cultivated. By training this system on an understanding
+            of player-behavior, it was able to detect the majority of true
+            anomalies, despite the heavy imbalance of smurfs to non-smurfs,
+            within the player pool.
+          </p>
+
+          <h2>Notable Findings</h2>
+          <p>
+            From the predictive analysis, additional modeling insights were
+            pulled that expanded on the pipeline’s understanding of distinction
+            between smurfs and non-smurfs. The top 9 most-influential statistics
+            that determined a smurf included: score, shots, saves, goals, shots
+            conceded, avg speed, count powerslide, percentage high in air, avg
+            distance to ball no possession, as can be seen in table 5. This
+            excludes LOF scoring, which also revealed high influence. The mean
+            averages of these statistics for each prediction class are seen in
+            table 6. From this table, the average gap between a non-smurf and a
+            true smurf can be seen in these statistics, giving more weight to
+            the issue of competitive integrity. Discussing about the nature of
+            these categories specifically, while score, shots, saves, and goals
+            act more as results-based indicators, stats like avg speed, count
+            powerslide, and percentage high in air, act as the behavioral-based
+            indicators that this study wanted to exclaim.
+          </p>
+
+          <h2>Limitations</h2>
+          <p>
+            The performance metrics that resulted from this analysis revealed
+            that while the majority of predictions can be correctly captured at
+            a high-performance rate, that same behavioral nature of the data
+            hindered the understanding of this detection system. The pipeline
+            was able to process, interpret, and understand the distinction
+            between a regular player and a statistical anomaly within a skill
+            group. However, it was unable to detect a player who was not an
+            obvious outlier or edge-case statistically. In other words, while
+            most smurfs appeared as statistically superior in their gameplay,
+            this modeling system was unable to detect the accounts who played
+            more-naturally to their similarly-ranked peers. This can speak to an
+            insight issue with the kind of data worked with in this study but
+            can also speak to the morally deceptive aspect of this online issue.
+            To solve this problem statistically, additional behavioral features
+            could be included in replays to give more potential insight to
+            predictive analysis.
+          </p>
+        </section>
+      </div>
+          <div class="card">
+      <div class="selecter">
+        <button id="dropdown">
+          <span class="selected">Top 5 Thresholds</span>
+          <span class="arrow"></span>
+        </button>
+        <ul class="dropdown hidden" id="selectdropdown">
+          <li data-value="visuals_from_csv/table1.png">Table 1 - XBClassifier Results (First Run)</li>
+          <li data-value="visuals_from_csv/table2.png">Table 2 - Prediction Threshold Evaluation</li>
+          <li data-value="visuals_from_csv/table3.png">Table 3 - XBClassifier Results (Final Run)</li>
+          <li data-value="visuals_from_csv/table4.png">Table 4 - Top 9 Most Influential Predictors of Smurfing</li>
+          <li data-value="visuals_from_csv/table5.png">Table 5 - Prediction Class Averages of Influential Predictors</li>
+          <li data-value="visuals_from_csv/Top 5 Thresholds - Bar plots.png">
+            Graph 1 - Average Smurf Score Disparity per Rank
+          </li>
+          <li data-value="visuals_from_csv/Point Disparity - Bar Plot.png">Graph 2 - Average Score per Rank</li>
+          <li data-value="visuals_from_csv/AVG Score - Bar Plot.png">Graph 3 - Top 5 Smurf Detection Thresholds</li>
+          <li data-value="visuals_from_csv/Speed Profile - Bar plot.png">Graph 4 - Player Speed Profile</li>
+          <li data-value="visuals_from_csv/Speed Distribution - Density plot.png">
+            Graph 5 - Average Speed Distribution
+          </li>
+          <li data-value="visuals_from_csv/Air vs Ground - Bar plot.png">Graph 6 - Aerial vs Ground Comparison</li>
+          <li data-value="visuals_from_csv/Boost Management - Bar Plot.png">Graph 7 - Boost Management Comparison</li>
+          <li data-value="visuals_from_csv/Boost Usage - Box plot.png">Graph 8 - Boost Usage Comparison</li>
+          <li data-value="visuals_from_csv/Boost Stealing - Density Plot.png">Graph 9 - Boost Steal Distribution </li>
+          <li data-value="visuals_from_csv/Pitch Positioning - Bar plot.png">
+            Graph 10 - Player Positioning Comparison
+          </li>
+          <li data-value="visuals_from_csv/Defensive Stats - Bar and Box Plot.png">
+            Graph 11 - Defensive Comparison
+          </li>
+          <li data-value="visuals_from_csv/Normal Correlation - Heatmap.png">
+           Graph 12 - Normal Player Correlation Heatmap
+          </li>
+          <li data-value="visuals_from_csv/Smurf Correlation - Heatmap.png">
+            Graph 13 - Smurf Correlation Heatmap
+          </li>
+          <li data-value="visuals_from_csv/graph14.png">Graph 14 - 2D t-SNE Dimension Space</li>
+          <li data-value="visuals_from_csv/graph15.png">Graph 15 - 3D t-SNE Dimension Space</li>
+          <li data-value="visuals_from_csv/graph16.png">Graph 16 - k-Means Clustering on t-SNE</li>
+          <li data-value="visuals_from_csv/graph17.png">Graph 17 - Average Offensive Third by Rank</li>
+        </ul>
+      </div>
+      <div class ="figure-container">
+      <img
+        id="figure-img"
+        src="visuals_from_csv/Top 5 Thresholds - Bar plots.png"
+        alt="Figure"
+      />
+      </div>
+    </div>
+    </div>
+
+
+
+    <script src="javascriptresearch.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <footer>
+      <p>Behavioral Analytics Research Group • © 2026</p>
+    </footer>
+  </body>
+</html>

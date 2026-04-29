@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Smurf Detection – Investigating Competitive Integrity Through Behavioral-based Modeling In Rocket League
+    </title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <section class="intro">
+      <h1>
+        Detecting Smurfing:<br />Competitive Integrity Through Behavioral
+        Analytics
+      </h1>
+      <p>
+        This project explores whether in game behavioral data can identify
+        smurfing in Rocket League. By analyzing player satistics across rank
+        tiers in Rocket League, we build behavioral profiles that reveal skill
+        level regardless of account rank. Our goal is to detect experienced
+        players on new accounts before traditional ranking systems can catch up.
+      </p>
+    </section>
+
+    <nav class="nav-bar">
+      <div class="nav-links">
+        <a href="home.html">Home</a>
+        <a href="research.html">Research</a>
+        <a href="data.html">Data</a>
+        <a href="references.html">References</a>
+      </div>
+    </nav>
+
+    <section class="overview">
+      <h2>What</h2>
+      <div class="columns">
+        <div class="card">
+          <h3>What is Smurfing?</h3>
+          <p>
+            Smurfing is the act of a highly skilled player bypassing a game's
+            skill-based matchmaking system by using a secondary, lower ranked
+            account. This creates a deliverate skill imbalance, allowing the
+            veteran player to dominate a less experienced opponent who believe
+            they are playing against peers of their current rank.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Why It's Dangerous</h3>
+          <p>
+            The act of smurfing undermines competitive integrity by creating
+            deliberate skill imbalance that corrupts matchmaking data and
+            discourages new player retention.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Findings</h3>
+          <p>
+Our research has shown that you can use behavioral statistics, rather than results-based ones, to create a high-performance detection system to combat irregular players within a skill group. Gaming companies can use this analysis to improve their online competitive environment by fairly balancing skilled-based matchmaking. 
+          </p>
+        </div>
+        <div class="card">
+          <h3>Something</h3>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipiscing elit. Sit amet
+            consectetur adipiscing elit quisque faucibus ex. Adipiscing elit
+            quisque faucibus ex sapien vitae pellentesque.
+          </p>
+        </div>
+      </div>
+    </section>
+    <section class="overview">
+      <h2>Introduction</h2>
+      <div class="card">
+        <section id="intro">
+          
+          <h3>1. Intro</h3>
+          <p>
+            Smurfing is a phenomenon in online gaming where highly skilled
+            players choose to create low-ranked accounts that deceive the
+            competitive ranking system to play against lower skilled players.
+            The reasoning for why players choose to do this is not clear to game
+            developers, rule-abiding players, or even researchers. In 2024, an
+            Ohio State University study surveyed 328 gaming-related, online
+            users and found that 69% admitted to smurfing themselves. This
+            phenomenon poses a persistent challenge for game developers in how
+            to maintain a balanced competitive environment when deception starts
+            at account creation. The consequences of smurfing ultimately
+            undermine the competitive integrity of online games by altering the
+            fairness and balance of competitive matchmaking. In doing so, it
+            distorts the ranked progression system and creates a more toxic
+            competitive environment. When left rampant, rule-abiding players
+            begin to feel the emotional distress of playing at a disadvantage,
+            causing a decline in player return rate.
+          </p>
+          <p>
+            Traditional detection and mitigation strategies primarily rely on
+            outcome-based signals such as win–loss patterns, rating
+            irregularities, or long-term account performance. These approaches
+            often struggle to detect irregular behavior during the early phases
+            of an account’s lifetime, prolonging the ability of smurfs to
+            negatively impact matchmaking quality. This study aims to combat
+            smurfing as early as possible by focusing on behavioral patterns
+            within games. Replay data was collected through the Ballchasing.com
+            API and processed to extract behavioral features across various
+            competitive ranks of the game Rocket League. Unsupervised learning
+            techniques are first employed to construct behavioral profiles that
+            characterize gameplay patterns within competitive tiers. Players
+            whose early gameplay exhibits significant deviation from these
+            rank-specific behavioral distributions are assigned an anomaly score
+            based on behavioral abnormality. To complement this unsupervised
+            profiling, a robust XGB classification model is trained and
+            optimized on the data, utilizing the unsupervised insights as
+            additional predictors. This system’s combination of unsupervised
+            insight and predictive analysis hope to give evidence that supports
+            the usage of behavioral statistics in producing high performance
+            anomaly analysis.
+          </p>
+          <p>
+            This research addresses the need for a more efficient and effective
+            smurf detection system, by addressing detection from a
+            behaviorally-focused understanding of smurfing. The findings of this
+            study aim to inform future matchmaking research and allow for
+            broader discussions about fairness and integrity in online
+            competitive environments. By emphasizing behavioral evidence and
+            early-stage inference, this work contributes a transparent and
+            extensible methodology for smurf detection. The methodology used in
+            this study hopes to complement existing ranking systems and offer
+            insight applicable to broader competitive gaming contexts.
+          </p>
+        </section>
+      </div>
+      <h2>Comparing Statistics</h2>
+      <div class="card">
+        <p>
+          In competitive online games like Rocket League, players are ranked by
+          skill and matched against opponents of similar ability. The data here
+          compares how players at three skill levels actually behave during a
+          match — not whether they win or lose, but how they play. "Beginner"
+          represents Bronze through Silver, "Intermediate" covers Gold through
+          Platinum, and "Expert" includes Diamond through Supersonic Legend.
+          Each stat measures an in-game action that improves with experience,
+          creating a behavioral fingerprint of skill. When a new account shows
+          expert-level behavior in these areas, it suggests the player may not
+          actually be a beginner. Select a stat below to explore the
+          differences.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="selecter">
+          <button id="dropdown">
+            <span class="selected">Pick a Stat</span>
+            <span class="arrow"></span>
+          </button>
+
+          <ul class="dropdown hidden" id="selectdropdown">
+            <li data-value="avg speed">Average Speed</li>
+            <li data-value="amount used while supersonic">
+              Boost Used While Supersonic
+            </li>
+            <li data-value="time high in air">Time High in Air</li>
+            <li data-value="percentage on ground">Percentage on Ground</li>
+            <li data-value="percentage offensive third">
+              Percentage Offensive Third
+            </li>
+            <li data-value="time supersonic speed">Time Supersonic Speed</li>
+            <li data-value="avg powerslide time">Avg Powerslide Time</li>
+            <li data-value="percentage behind ball">Percentage Behind Ball</li>
+          </ul>
+        </div>
+        <div id="plot"></div>
+
+        <p id="description"></p>
+      </div>
+    </section>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="javascript.js"></script>
+    <footer>
+      <p>Behavioral Analytics Research Group •</p>
+    </footer>
+  </body>
+</html>

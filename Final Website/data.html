@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Smurf Detection – Investigating Competitive Integrity Through Behavioral-based Modeling In Rocket League
+    </title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <section class="intro">
+      <h1>
+        Detecting Smurfing:<br />Competitive Integrity Through Behavioral
+        Analytics
+      </h1>
+      <p>
+        This project explores whether in game behavioral data can identify
+        smurfing in Rocket League. By analyzing player satistics across rank
+        tiers in Rocket League, we build behavioral profiles that reveal skill
+        level regardless of account rank. Our goal is to detect experienced
+        players on new accounts before traditional ranking systems can catch up.
+      </p>
+    </section>
+
+    <nav class="nav-bar">
+      <div class="nav-links">
+        <a href="home.html">Home</a>
+        <a href="research.html">Research</a>
+        <a href="data.html">Data</a>
+        <a href="references.html">References</a>
+      </div>
+    </nav>
+
+    <section class="rows">
+      <div class="card">
+        <!-- Buttons similar from home page to create graph and level-->
+        <div class="selecter">
+          <button id="dropdown">
+            <span class="selected">Pick</span>
+            <span class="arrow"></span>
+          </button>
+          <ul class="dropdown hidden" id="selectdropdown">
+            <li data-value="tsne">3D t-SNE</li>
+            <li data-value="summary">Summary</li>
+            <li data-value="scatter">Smurf Probability</li>
+          </ul>
+        </div>
+
+        <div id="plot"></div>
+      </div>
+    </section>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="javascriptdata.js"></script>
+    <footer>
+      <p>Behavioral Analytics Research Group •</p>
+    </footer>
+  </body>
+</html>

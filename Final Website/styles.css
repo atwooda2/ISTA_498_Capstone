@@ -1,0 +1,279 @@
+/* reuseable colors */
+:root {
+  --bg-dark: #0f172a;
+  --bg-darker: #020617;
+  --text-light: #f1f5f9;
+  --accent: #38bdf8;
+  --card-bg: #1e293b;
+}
+
+/* ALL PAGES CSS*/
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+/* Title */
+.intro {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(to bottom, var(--bg-darker), var(--bg-dark));
+}
+
+.intro h1 {
+  font-size: clamp(2.5rem, 6vw, 4.2rem);
+  margin-bottom: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.intro p {
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  max-width: 720px;
+  margin-bottom: 0.5rem;
+  opacity: 0.85;
+}
+
+/* Navigation bar below the title */
+.nav-bar {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  padding: 1.2rem 2rem;
+  text-align: center;
+  border-top: 1px solid rgba(248, 250, 252, 0.08);
+  border-bottom: 1px solid rgba(248, 250, 252, 0.08);
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--text-light);
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.2s, border-color 0.2s;
+  border: 3px solid transparent;
+  border-radius: 10px;
+  padding: 6px;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+  border-color: rgba(248, 250, 252, 0.1);
+}
+
+/* Overview section and cards to be resued*/
+.overview {
+  padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.overview h2,
+.reference {
+  text-align: center;
+  font-size: 2.8rem;
+  margin-bottom: 3.5rem;
+  color: var(--accent);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 2.5rem;
+}
+
+.rows {
+  display: grid;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+.card {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(248, 250, 252, 0.1);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(117, 184, 78, 0);
+}
+
+.card h3 {
+  color: var(--accent);
+  margin-bottom: 1.2rem;
+  font-size: 1.6rem;
+}
+
+.introcard p {
+  text-indent: 2rem;
+  margin-bottom: 1rem;
+}
+
+/*selector dropdown styling*/
+
+.selecter {
+  margin: 1rem auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 300px;
+  max-width: 100%;
+  z-index: 10;
+}
+
+.dropdown li {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.dropdown {
+  position: absolute;
+  background: var(--card-bg);
+  border: 1px solid rgba(248, 250, 252, 0.1);
+  border-radius: 8px;
+  list-style: none;
+  width: 100%;
+  padding: 0.5rem 0;
+  z-index: 10;
+}
+
+.dropdown li {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.dropdown li:hover {
+  background: rgba(56, 189, 248, 0.1);
+}
+
+#dropdown,
+#dropdownright {
+  background: #0c4a6e;
+  color: var(--text-light);
+  border: 1px solid rgba(248, 250, 252, 0.1);
+  padding: 0.5rem 0.5rem;
+  border-radius: 20px;
+  font-size: 1rem;
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
+}
+
+#dropdown:hover {
+  border-color: var(--accent);
+}
+
+/*description styling homepage */
+#description {
+  text-align: center;
+  margin-top: 1rem;
+  opacity: 0.85;
+  font-size: 1.1rem;
+}
+
+/* appendix hanging indent */
+.references li {
+  padding-left: 2em;
+  text-indent: -2rem;
+  margin-bottom: 1rem;
+  list-style-position: inside;
+}
+
+.references a {
+  color: var(--accent);
+  word-break: break-all;
+}
+
+/*Styling for smurf probability table */
+
+.prediction-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.prediction-table th,
+.prediction-table td {
+  padding: 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(248, 250, 252, 0.1);
+}
+
+.prediction-table th {
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+.prediction-table tr:hover {
+  background: rgba(56, 189, 248, 0.05);
+}
+
+/*Styling for research page graphs and tables, container to stop moving in size */
+
+.figure-container {
+  height: 550px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#figure-img {
+  width: 100%;
+  max-width: 800px;
+  max-height: 500px;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 8px;
+
+}
+
+/* visuals styling */
+
+/* home page visuals*/
+#plot {
+  width: 100%;
+  height: 600px;
+}
+
+/*data page visuals */
+#tsne-3d {
+  width: 100%;
+  min-height: 500px;
+}
+
+/* Responsivness */
+@media (max-width: 640px) {
+  .title {
+    min-height: 70vh;
+    padding: 3rem 1.5rem;
+  }
+
+  .nav-links {
+    gap: 1.5rem;
+  }
+}
